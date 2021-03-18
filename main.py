@@ -15,8 +15,9 @@ if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     
     # generate random data with pandas and np
-    df = pd.DataFrame(np.random.randint(0, 1000, size=(10000, 3)), columns=list('ABC'))
-    df['D'] = [''.join((random.choice(string.ascii_letters) for i in range(8))) for i in range(10000)]
+    lengthOfDataFrame = 100000
+    df = pd.DataFrame(np.random.randint(0, 1000, size=(lengthOfDataFrame, 3)), columns=list('ABC'))
+    df['D'] = [''.join((random.choice(string.ascii_letters) for i in range(8))) for i in range(lengthOfDataFrame)]
     
     # define model for a pandas DataFrame - definition in dataFrameModel class
     model = DataFrameModel(df)
