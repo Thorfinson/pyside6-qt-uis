@@ -4,25 +4,30 @@ import QtQuick.Controls 6
 import QtQuick.Controls.Material 2.15
 import QtQuick.Particles 2.15
 
+// Main Window
 ApplicationWindow{
     id: window
+    // define width and height
     width: 1600
     height: 900
     visible:true
+
+    // Title
     title: qsTr("Main View")
-    property color menuBackgroundColor: "#3C3C3C"
-    property color menuBorderColor: "#282828"
     
-    // Set Flags
-    flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.CustomizeWindowHint | Qt.Dialog | Qt.WindowTitleHint | FramelessWindowHint
+    // Set Window Flags
+    flags: Qt.WindowCloseButtonHint | Qt.WindowMinimizeButtonHint | Qt.WindowMaximizeButtonHint | Qt.CustomizeWindowHint | Qt.Dialog | Qt.WindowTitleHint
     
+    // Set Dark Material Theme as main theme and set the accent to light blue
     Material.theme: Material.Dark
     Material.accent: Material.LightBlue   
 
+    // Create a horizontal SplitView
     SplitView {
         anchors.fill: parent
         orientation: Qt.Horizontal
 
+        // Left Rectangle with Vertical Splitview
         Rectangle {
             implicitWidth: 1150
             SplitView.maximumWidth: 1400
@@ -30,6 +35,7 @@ ApplicationWindow{
             SplitView {
                 anchors.fill: parent
                 orientation: Qt.Vertical
+                // Top Left Rectangle with the loads of Standard Controls - mostly taken from https://doc.qt.io/qt-5/qtquick-controls2-qmlmodule.html
                 Rectangle {
                     id: topleftview
                     color: "#2e2e2e"
@@ -175,6 +181,7 @@ ApplicationWindow{
                         }
                     }
                 }
+                // Lower Left Rectangle with the fireworks - mostly taken from https://qmlbook.github.io/ch10-particles/particles.html#particle-groups
                 Rectangle {
                     color: "#2e2e2e"
                     id: root
@@ -189,9 +196,7 @@ ApplicationWindow{
                         enabled: true
                         lifeSpan: 1600
                         maximumEmitted: 30
-                        // Specify the logical group that
-                        // the emitter belongs to
-                        group: "A"
+                        group: "Fire"
                         // we want to emit particles
                         // from the bottom of the window
                         anchors{
@@ -199,15 +204,16 @@ ApplicationWindow{
                             right: parent.right
                             bottom: parent.bottom
                         }
-
+                        // velocity for the rockets
                         velocity:  AngleDirection {
                                     angle: 270
                                     angleVariation: 10
                                     magnitude: 200
                                 }
+                        // Define the exploding particle Goal
                         GroupGoal {
                             // on which group to apply
-                            groups: ["A"]
+                            groups: ["Fire"]
                             // the goalState
                             goalState: "exploding"
                             system: particlesSystem
@@ -218,18 +224,20 @@ ApplicationWindow{
                             // make the particles immediately move to the goal state
                             jump: true
                         }
+                        // Set the particle image
                         ImageParticle {
                             source: "../resources/particle.png"
                             system: particlesSystem
                             color: "red"
-                            groups: ["A"]
+                            groups: ["Fire"]
                         }
                     }
+                    // Smoke Trail Emitter
                     TrailEmitter {
                         system: particlesSystem
-                        group: "B"
-                        // follow particle emitted by fireWorkEmitter
-                        follow: "A"
+                        group: "Smoke"
+                        // follow another particle
+                        follow: "Fire"
                         size: 12
                         emitRatePerParticle: 30
                         velocity: PointDirection {yVariation: 10; xVariation: 10}
@@ -237,7 +245,7 @@ ApplicationWindow{
                         ImageParticle {
                             source: "../resources/particle.png"
                             system: particlesSystem
-                            groups: ["B"]
+                            groups: ["Smoke"]
                             color: "white"
                         }
                     }
@@ -247,7 +255,7 @@ ApplicationWindow{
                         system: particlesSystem
 
                         TrailEmitter {
-                            group: "C"
+                            group: "Particles"
                             enabled: true
                             anchors.fill: parent
                             lifeSpan: 1000
@@ -258,13 +266,14 @@ ApplicationWindow{
                             ImageParticle {
                                 source: "../resources/particle.png"
                                 system: particlesSystem
-                                groups: ["C"]
+                                groups: ["Particles"]
                                 color: "red"
                                 colorVariation: 1.2
                             }                            
                         }
                     }
-                    ShaderEffect {
+                    // Shader not working without qsb
+/*                     ShaderEffect {
                         id: shaderEffect
                         anchors {
                             left: parent.left
@@ -280,16 +289,40 @@ ApplicationWindow{
                             duration: 1000
                             loops: Animation.Infinite
                         }
-                        fragmentShader: "../resources/effect.cso"
-                    }
+                        fragmentShader: "../resources/effect.frag"
+                    }*/
                 }
             }
         }
+        // Right DataFrame Table View with 10000 Items
         Rectangle {
             color: "#2e2e2e"
             id: rightitem
             SplitView.minimumWidth: 200
             SplitView.fillWidth: true
+
+            TableView {
+                id: tableView
+
+                columnWidthProvider: function (column) { return 100; }
+                rowHeightProvider: function (column) { return 60; }
+                anchors.fill: parent
+                // set the model added with engine.rootContext().setContextProperty("table_model", model)
+                model: table_model
+                delegate: Rectangle {
+                    color: "#2e2e2e"
+                    Text {
+                        text: display
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        color: 'white'
+                        font.pixelSize: 15
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                }
+                ScrollIndicator.horizontal: ScrollIndicator { }
+                ScrollIndicator.vertical: ScrollIndicator { }
+            }
         }
     }
 }
