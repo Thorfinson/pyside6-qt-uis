@@ -2,7 +2,6 @@ import QtQuick 6
 import QtQuick.Window 2.15
 import QtQuick.Controls 6
 import QtQuick.Controls.Material 2.15
-import QtQuick.Particles 2.15
 
 // Main Window
 ApplicationWindow{
@@ -70,6 +69,7 @@ ApplicationWindow{
                         }
                         Column {
                             RoundButton {
+                                anchors.horizontalCenter: parent.horizontalCenter
                                 text: "Round Button"
                                 onClicked: popup.open()
 
@@ -85,11 +85,30 @@ ApplicationWindow{
                                 }                                
                             }
                             DelayButton {
-                                text: "Delay Button"
-                                delay: 3000
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Add " + numberOfRowsToAdd.value.toFixed(0) + " Rows" 
+                                delay: 1000
+                                onClicked: tableView.model.addRows(numberOfRowsToAdd.value)
+                            }
+                            Button {
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                text: "Empty DataFrame"
+                                onClicked: tableView.model.emptyDataFrame()
                             }
                             Dial {
-                               height: 80
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                id: numberOfRowsToAdd
+                                height: 80
+                                stepSize: 1
+                                snapMode: Dial.SnapOnRelease
+                                from: 0
+                                to: 100
+                                rotation: 150
+                            }
+                            Text {
+                                text: numberOfRowsToAdd.value
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                color: "white"
                             }
                         }
                         Column {
@@ -181,120 +200,22 @@ ApplicationWindow{
                         }
                     }
                 }
-                // Lower Left Rectangle with the fireworks - mostly taken from https://qmlbook.github.io/ch10-particles/particles.html#particle-groups
+                // Lower Left Rectangle with  fireworks
                 Rectangle {
                     color: "#2e2e2e"
                     id: root
                     SplitView.fillHeight: true
-                    // main particle system
-                    ParticleSystem {id: particlesSystem}
-
-                    // firework emitter
-                    Emitter {
-                        id: fireWorkEmitter
-                        system: particlesSystem
-                        enabled: true
-                        lifeSpan: 1600
-                        maximumEmitted: 30
-                        group: "Fire"
-                        // we want to emit particles
-                        // from the bottom of the window
-                        anchors{
-                            left: parent.left
-                            right: parent.right
-                            bottom: parent.bottom
-                        }
-                        // velocity for the rockets
-                        velocity:  AngleDirection {
-                                    angle: 270
-                                    angleVariation: 10
-                                    magnitude: 200
-                                }
-                        // Define the exploding particle Goal
-                        GroupGoal {
-                            // on which group to apply
-                            groups: ["Fire"]
-                            // the goalState
-                            goalState: "exploding"
-                            system: particlesSystem
-                            // switch once the particles reach the window center
-                            y: - root.height / 2
-                            width: parent.width
-                            height: 10
-                            // make the particles immediately move to the goal state
-                            jump: true
-                        }
-                        // Set the particle image
-                        ImageParticle {
-                            source: "../resources/particle.png"
-                            system: particlesSystem
-                            color: "red"
-                            groups: ["Fire"]
-                        }
+                    
+                    // defined in Fireworks.qml
+                    Fireworks {
+                        color: "#2e2e2e"
+                        anchors.fill: parent
+                        emittedRockets: 4
                     }
-                    // Smoke Trail Emitter
-                    TrailEmitter {
-                        system: particlesSystem
-                        group: "Smoke"
-                        // follow another particle
-                        follow: "Fire"
-                        size: 12
-                        emitRatePerParticle: 30
-                        velocity: PointDirection {yVariation: 10; xVariation: 10}
-                        acceleration: PointDirection {y:  10}
-                        ImageParticle {
-                            source: "../resources/particle.png"
-                            system: particlesSystem
-                            groups: ["Smoke"]
-                            color: "white"
-                        }
-                    }
-                    ParticleGroup {
-                        name: "exploding"
-                        duration: 3000
-                        system: particlesSystem
-
-                        TrailEmitter {
-                            group: "Particles"
-                            enabled: true
-                            anchors.fill: parent
-                            lifeSpan: 1000
-                            emitRatePerParticle: 1000
-                            size: 14
-                            velocity: AngleDirection {angleVariation: 360; magnitude: 100}
-                            acceleration: PointDirection {y:  20}
-                            ImageParticle {
-                                source: "../resources/particle.png"
-                                system: particlesSystem
-                                groups: ["Particles"]
-                                color: "red"
-                                colorVariation: 1.2
-                            }                            
-                        }
-                    }
-                    // Shader not working without qsb
-/*                     ShaderEffect {
-                        id: shaderEffect
-                        anchors {
-                            left: parent.left
-                            top: parent.top
-                        }
-                        property variant source: background
-                        property real frequency: 20
-                        property real amplitude: 0.05
-                        property real time
-                        
-                        NumberAnimation on time {
-                            from: 0; to: Math.PI*2
-                            duration: 1000
-                            loops: Animation.Infinite
-                        }
-                        fragmentShader: "../resources/effect.frag"
-                    }*/
                 }
             }
         }
-        // Right DataFrame Table View with 10000 Items
+        // Right DataFrame Table View with x Items
         Rectangle {
             color: "#2e2e2e"
             id: rightitem
@@ -305,9 +226,9 @@ ApplicationWindow{
                 id: tableView
 
                 columnWidthProvider: function (column) { return 100; }
-                rowHeightProvider: function (column) { return 60; }
+                rowHeightProvider: function (column) { return 20; }
                 anchors.fill: parent
-                // set the model added with engine.rootContext().setContextProperty("table_model", model)
+                // set here and define the model in backend with engine.rootContext().setContextProperty("table_model", model)
                 model: table_model
                 delegate: Rectangle {
                     color: "#2e2e2e"

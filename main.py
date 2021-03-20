@@ -1,26 +1,22 @@
 import sys
 import os
-import random
-import string
 
 from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
-import numpy as np
 import pandas as pd
 
 from dataFrameModel import DataFrameModel
+from dataFrameGenerator import generate_rows
 
 if __name__ == "__main__":
     app = QGuiApplication(sys.argv)
     
-    # generate random data with pandas and np
-    lengthOfDataFrame = 100000
-    df = pd.DataFrame(np.random.randint(0, 1000, size=(lengthOfDataFrame, 3)), columns=list('ABC'))
-    df['D'] = [''.join((random.choice(string.ascii_letters) for i in range(8))) for i in range(lengthOfDataFrame)]
-    
-    # define model for a pandas DataFrame - definition in dataFrameModel class
-    model = DataFrameModel(df)
+    # call our dataframe generator with first x rows
+    df_generated = generate_rows(5)
+
+    # define model for a pandas DataFrame - implementation in DataFrameModel class
+    model = DataFrameModel(df_generated)
 
     # start Engine and add model as table_model
     engine = QQmlApplicationEngine()
