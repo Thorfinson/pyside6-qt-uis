@@ -1,6 +1,6 @@
 # pyside6-qt-ui
 
-Trying stuff with pyside6 and qt.
+Trying out stuff with pyside6 and qt.
 to install the needed packages:
 ```
 pip install -r requirements.txt 
@@ -8,5 +8,5 @@ pip install -r requirements.txt
 
 To launch:
 ```
-python main.py
+python <project-dir>\main.py
 ```
